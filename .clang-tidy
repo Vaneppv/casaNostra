@@ -1,0 +1,46 @@
+Checks: >
+    -*,
+    modernize-*,
+    readability-*,
+    performance-*,
+    cppcoreguidelines-*,
+    clang-analyzer-*,
+    bugprone-*,
+    google-*,
+    hicpp-*
+
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*'
+FormatStyle: file
+
+CheckOptions:
+  - key:   readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key:   readability-identifier-naming.StructCase
+    value: CamelCase
+  - key:   readability-identifier-naming.FunctionCase
+    value: lower_case
+  - key:   readability-identifier-naming.VariableCase
+    value: lower_case
+  - key:   readability-identifier-naming.MemberCase
+    value: lower_case
+  - key:   readability-identifier-naming.ParameterCase
+    value: lower_case
+  - key:   readability-identifier-naming.ConstantCase
+    value: UPPER_CASE
+  - key:   readability-identifier-naming.EnumCase
+    value: CamelCase
+  - key:   readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+  - key:   modernize-use-auto
+    value: '0'
+  - key:   modernize-avoid-c-arrays
+    value: '0'
+  - key:   modernize-use-trailing-return-type
+    value: '0'
+  - key:   hicpp-vararg
+    value: '0'
+  - key:   cppcoreguidelines-pro-bounds-array-to-pointer-decay
+    value: '0'
+  - key:   cppcoreguidelines-pro-type-vararg
+    value: '0'
