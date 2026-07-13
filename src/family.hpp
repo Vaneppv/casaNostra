@@ -35,6 +35,8 @@ private:
 
 public:
     FamilyTree() : m_root(nullptr) {}
-
+    
     Member* get_root() const { return m_root; }
+
+    Member* find_member_by_id(Member* node, int id) const;
 };
