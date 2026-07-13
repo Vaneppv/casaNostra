@@ -33,10 +33,12 @@ class FamilyTree {
 private:
     Member* m_root;
 
+    void delete_tree(Member* node); 
+    Member* find_member_by_id_rec(Member* node, int id) const;  
+
 public:
     FamilyTree() : m_root(nullptr) {}
-    
+    ~FamilyTree() { delete_tree(m_root); }
     Member* get_root() const { return m_root; }
-
-    Member* find_member_by_id(Member* node, int id) const;
+    Member* find_member_by_id(int id) const;  // wrapper público
 };
