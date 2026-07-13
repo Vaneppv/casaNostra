@@ -19,6 +19,9 @@
 - Sin espacios ni símbolos especiales (acentos, ñ, etc.) **La excepción a la
   regla es en palabras en español que se le presenten al usuario** (como nombres,
   apellidos, etc.).
+- utilizar el prefijo `m_*` (que proviene de member) para nombres de atributos
+  de clase. Esto nos permite diferenciar entre los nombres de variables locales
+  y atributos de clase.
 
 | Antes              | Después             |
 | ------------------ | ------------------- |
@@ -33,11 +36,15 @@ PascalCase.
 ```cpp
 // Bien
 class FamilyTree { };
-class Member { };
+class Member {
+    m_edad = 12;
+};
 
 // Mal
 class family_tree { };
-class member { };
+class member {
+    edad = 12;
+};
 ```
 
 ### Funciones y variables
