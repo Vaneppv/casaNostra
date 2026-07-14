@@ -32,6 +32,7 @@ public:
 class FamilyTree {
 private:
     Member* m_root;
+    OrphanQueue m_orphan_queue;
 
     void delete_tree(Member* node); 
     Member* find_member_by_id_rec(Member* node, int id) const;  
@@ -41,4 +42,34 @@ public:
     ~FamilyTree() { delete_tree(m_root); }
     Member* get_root() const { return m_root; }
     Member* find_member_by_id(int id) const;  // wrapper público
+};
+
+class OrphanNode {
+public:
+    Member* m_member;
+    OrphanNode* m_next;
+
+    OrphanNode(Member* member) : m_member(member), m_next(nullptr) {}
+};
+
+class OrphanQueue {
+private: 
+    OrphanNode* m_first;
+    OrphanNode* m_last;
+    int m_size;
+
+public:
+    OrphanQueue() : m_first(nullptr), m_last(nullptr), m_size(0) {}
+
+    ~OrphanQueue() {
+        while (m_first != nullptr) {
+            pop();
+        }
+    }
+
+    void push(Member* member);
+    Member* pop();
+    Member* peek_first () { return this->m_first->m_member; }
+    bool empty() const { return m_first == nullptr; }
+    int size() const { return m_size; }
 };
