@@ -1,0 +1,10 @@
+id,name,last_name,gender,age,id_boss,is_dead,in_jail,was_boss,is_boss
+1,Vito,Corleone,H,72,0,0,0,0,1
+2,Sonny,Corleone,H,46,1,1,0,1,0
+3,Michael,Corleone,H,38,1,0,0,0,0
+4,Tom,Hagen,H,42,2,0,0,0,0
+5,Anthony,Corleone,H,19,3,0,0,0,0
+6,Mary,Corleone,M,17,3,0,0,0,0
+7,Frankie,Pentangeli,H,25,4,0,0,0,0
+8,Rosario,Pentangeli,H,30,4,0,0,0,0
+9,Carlo,Rizzi,H,35,2,0,1,0,0
