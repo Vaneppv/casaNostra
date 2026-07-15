@@ -26,3 +26,5 @@ bin/*.out
 # OS
 .DS_Store
 Thumbs.db
+
+.clang-tidy

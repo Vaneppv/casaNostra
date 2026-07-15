@@ -22,28 +22,10 @@ public:
     Member* m_left = nullptr;
     Member* m_right = nullptr;
 
-    Member(int id, std::string n, std::string ln, char g, int a, int id_b, bool d, bool j, bool wb,
-           bool ib)
-        : m_id(id), m_name(std::move(n)), m_last_name(std::move(ln)), m_gender(g), m_age(a),
-          m_id_boss(id_b), m_is_dead(d), m_in_jail(j), m_was_boss(wb), m_is_boss(ib),
-          m_boss(nullptr), m_left(nullptr), m_right(nullptr) {}
-};
-
-class FamilyTree {
-private:
-    Member* m_root;
-    OrphanQueue m_orphan_queue;
-
-    void delete_tree(Member* node); 
-    Member* find_member_by_id_rec(Member* node, int id) const;
-    void attach_orphans();  
-
-public:
-    FamilyTree() : m_root(nullptr) {}
-    ~FamilyTree() { delete_tree(m_root); }
-    Member* get_root() const { return m_root; }
-    void load_from_csv(const std::string& filename);
-    Member* find_member_by_id(int id) const;  // wrapper público
+    Member(int id, std::string name, std::string last, char gender, int age, int id_b, bool dead, bool jail, bool was_b,
+           bool is_b)
+        : m_id(id), m_name(std::move(name)), m_last_name(std::move(last)), m_gender(gender), m_age(age),
+          m_id_boss(id_b), m_is_dead(dead), m_in_jail(jail), m_was_boss(was_b), m_is_boss(is_b) {}
 };
 
 class OrphanNode {
@@ -74,4 +56,21 @@ public:
     Member* peek_first () { return this->m_first->m_member; }
     bool empty() const { return m_first == nullptr; }
     int size() const { return m_size; }
+};
+
+class FamilyTree {
+private:
+    Member* m_root = nullptr;
+    OrphanQueue m_orphan_queue;
+
+    void delete_tree(Member* node); 
+    Member* find_member_by_id_rec(Member* node, int id) const;
+    void attach_orphans();  
+
+public:
+    FamilyTree() = default;
+    ~FamilyTree() { delete_tree(m_root); }
+    Member* get_root() const { return m_root; }
+    void load_from_csv(const std::string& filename);
+    Member* find_member_by_id(int id) const;  // wrapper público
 };

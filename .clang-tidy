@@ -1,11 +1,14 @@
 Checks: >
     -*,
     modernize-*,
+    -modernize-use-trailing-return-type,
+    -modernize-use-auto,
     readability-*,
     performance-*,
     cppcoreguidelines-*,
     clang-analyzer-*,
     bugprone-*,
+    -bugprone-easily-swappable-parameters,
     google-*,
     hicpp-*
 
