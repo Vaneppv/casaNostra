@@ -72,5 +72,6 @@ public:
     ~FamilyTree() { delete_tree(m_root); }
     Member* get_root() const { return m_root; }
     void load_from_csv(const std::string& filename);
-    Member* find_member_by_id(int id) const;  // wrapper público
+    Member* find_member_by_id(int id) const;
+    void edit_member(int id);
 };

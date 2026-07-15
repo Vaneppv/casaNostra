@@ -190,3 +190,96 @@ void FamilyTree::load_from_csv(const string& filename) {
         delete m; // Se liberan al no poder almacenarse
     }
 }
+
+void FamilyTree::edit_member(int id) {
+    Member* member = find_member_by_id(id);
+    if (member == nullptr) {
+        cout << "No se encontro un miembro con ID " << id << "\n";
+        return;
+    }
+
+    bool editing = true;
+    while (editing) {
+        cout << "\n--- Editando a " << member->m_name << " " << member->m_last_name << " (ID: " << member->m_id << ") ---\n";
+        cout << "1. Nombre: " << member->m_name << "\n";
+        cout << "2. Apellido: " << member->m_last_name << "\n";
+        cout << "3. Genero: " << member->m_gender << "\n";
+        cout << "4. Edad: " << member->m_age << "\n";
+        cout << "5. Esta muerto: " << (member->m_is_dead ? "Si" : "No") << "\n";
+        cout << "6. En prision: " << (member->m_in_jail ? "Si" : "No") << "\n";
+        cout << "7. Fue jefe: " << (member->m_was_boss ? "Si" : "No") << "\n";
+        cout << "8. Es jefe: " << (member->m_is_boss ? "Si" : "No") << "\n";
+        cout << "0. Salir\n";
+        cout << "Seleccione el campo a editar: ";
+
+        int option;
+        cin >> option;
+        cin.ignore();
+
+        switch (option) {
+        case 1: {
+            cout << "Ingrese nuevo nombre: ";
+            getline(cin, member->m_name);
+            break;
+        }
+        case 2: {
+            cout << "Ingrese nuevo apellido: ";
+            getline(cin, member->m_last_name);
+            break;
+        }
+        case 3: {
+            char g;
+            while (true) {
+                cout << "Ingrese nuevo genero (H/M): ";
+                cin >> g;
+                cin.ignore();
+                if (g == 'H' || g == 'M') {
+                    member->m_gender = g;
+                    break;
+                }
+                cout << "Error: solo H o M\n";
+            }
+            break;
+        }
+        case 4: {
+            int a;
+            while (true) {
+                cout << "Ingrese nueva edad: ";
+                cin >> a;
+                cin.ignore();
+                if (a > 0 && a < 150) {
+                    member->m_age = a;
+                    break;
+                }
+                cout << "Error: edad fuera de rango.\n";
+            }
+            break;
+        }
+        case 5: {
+            member->m_is_dead = !member->m_is_dead;
+            cout << "Estado cambiado a: " << (member->m_is_dead ? "Muerto" : "Vivo") << "\n";
+            break;
+        }
+        case 6: {
+            member->m_in_jail = !member->m_in_jail;
+            cout << "Estado cambiado a: " << (member->m_in_jail ? "En prision" : "Libre") << "\n";
+            break;
+        }
+        case 7: {
+            member->m_was_boss = !member->m_was_boss;
+            cout << "Estado cambiado a: " << (member->m_was_boss ? "Fue jefe" : "No fue jefe") << "\n";
+            break;
+        }
+        case 8: {
+            member->m_is_boss = !member->m_is_boss;
+            cout << "Estado cambiado a: " << (member->m_is_boss ? "Es jefe" : "Ya no es jefe") << "\n";
+            break;
+        }
+        case 0:
+            editing = false;
+            break;
+        default:
+            cout << "Opcion invalida\n";
+        }
+    }
+}
