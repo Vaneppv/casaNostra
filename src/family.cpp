@@ -30,14 +30,27 @@ Member* FamilyTree::find_member_by_id(int id) const {
 }
 
 Member* FamilyTree::find_first_alive_free(Member* node) const {
-    if (node == nullptr) { return nullptr; }
-    
+    if (node == nullptr) { 
+        return nullptr; 
+    }
     if (!node->m_is_dead && !node->m_in_jail) {
         return node;
     }
     Member* found = find_first_alive_free(node->m_left);
     if (found != nullptr) { return found; }
     return find_first_alive_free(node->m_right);
+}
+
+Member* FamilyTree::find_first_alive_jailed(Member* node) const {
+    if (node == nullptr) { 
+        return nullptr;
+    }
+    if (!node->m_is_dead && node->m_in_jail) {
+        return node;
+    }
+    Member* found = find_first_alive_jailed(node->m_left);
+    if (found != nullptr) { return found; }
+    return find_first_alive_jailed(node->m_right);
 }
 
 void OrphanQueue::push(Member* member) {
