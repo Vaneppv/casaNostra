@@ -1,7 +1,8 @@
-#include "family.hpp"
+#include "family_tree.hpp"
+
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -30,75 +31,50 @@ Member* FamilyTree::find_member_by_id(int id) const {
 }
 
 Member* FamilyTree::find_first_alive_free(Member* node) const {
-    if (node == nullptr) { 
-        return nullptr; 
+    if (node == nullptr) {
+        return nullptr;
     }
     if (!node->m_is_dead && !node->m_in_jail) {
         return node;
     }
     Member* found = find_first_alive_free(node->m_left);
-    if (found != nullptr) { return found; }
+    if (found != nullptr) {
+        return found;
+    }
     return find_first_alive_free(node->m_right);
 }
 
 Member* FamilyTree::find_first_alive_jailed(Member* node) const {
-    if (node == nullptr) { 
+    if (node == nullptr) {
         return nullptr;
     }
     if (!node->m_is_dead && node->m_in_jail) {
         return node;
     }
     Member* found = find_first_alive_jailed(node->m_left);
-    if (found != nullptr) { return found; }
+    if (found != nullptr) {
+        return found;
+    }
     return find_first_alive_jailed(node->m_right);
-}
-
-void OrphanQueue::push(Member* member) {
-    OrphanNode* orphan = new OrphanNode(member);
-        
-    if (m_first == nullptr) {
-        m_first = orphan;
-        m_last = orphan;
-    } else {
-        m_last->m_next = orphan; 
-        m_last = orphan;         
-    }
-    m_size++;
-}
-
-Member* OrphanQueue::pop() {
-    if (m_first == nullptr) {
-        throw runtime_error("La cola esta vacia");
-    }
-
-    OrphanNode* temp = m_first;
-    Member* member = temp->m_member;
-
-    m_first = m_first->m_next;
-
-    if (m_first == nullptr) {
-        m_last = nullptr;
-    }
-
-    m_size--;
-    delete temp;
-    return member;
 }
 
 void FamilyTree::attach_orphans() {
     bool progress;
     do {
         progress = false;
-        OrphanQueue temp;  // cola para los que no se puedan enlazar aún
+        OrphanQueue temp; // cola para los que no se puedan enlazar aún
         while (!m_orphan_queue.empty()) {
             Member* m = m_orphan_queue.pop();
             Member* boss = find_member_by_id(m->m_id_boss);
             if (boss != nullptr) {
                 m->m_boss = boss;
-                if (boss->m_left == nullptr) boss->m_left = m;
-                else if (boss->m_right == nullptr) boss->m_right = m;
+                if (boss->m_left == nullptr)
+                    boss->m_left = m;
+                else if (boss->m_right == nullptr)
+                    boss->m_right = m;
                 else {
-                    cerr << "Jefe " << boss->m_id << " lleno al intentar agregar a " << m->m_id << "\n";
+                    cerr << "Jefe " << boss->m_id << " lleno al intentar agregar a " << m->m_id
+                         << "\n";
                     delete m; // no podemos agregarlo, se descarta
                 }
                 progress = true;
@@ -139,28 +115,38 @@ void FamilyTree::load_from_csv(const string& filename) {
         bool is_dead, in_jail, was_boss, is_boss;
 
         // id
-        getline(ss, token, ','); id = stoi(token);
+        getline(ss, token, ',');
+        id = stoi(token);
         // name
-        getline(ss, token, ','); name = token;
+        getline(ss, token, ',');
+        name = token;
         // last_name
-        getline(ss, token, ','); last_name = token;
+        getline(ss, token, ',');
+        last_name = token;
         // gender
-        getline(ss, token, ','); gender = token[0];
-        
-        getline(ss, token, ','); age = stoi(token);
-        // id_boss
-        getline(ss, token, ','); id_boss = stoi(token);
-        // is_dead
-        getline(ss, token, ','); is_dead = (stoi(token) == 1);
-        // in_jail
-        getline(ss, token, ','); in_jail = (stoi(token) == 1);
-        // was_boss
-        getline(ss, token, ','); was_boss = (stoi(token) == 1);
-        // is_boss
-        getline(ss, token, ','); is_boss = (stoi(token) == 1);
+        getline(ss, token, ',');
+        gender = token[0];
 
-        Member* new_member = new Member(id, name, last_name, gender, age,
-            id_boss, is_dead, in_jail, was_boss, is_boss);
+        getline(ss, token, ',');
+        age = stoi(token);
+        // id_boss
+        getline(ss, token, ',');
+        id_boss = stoi(token);
+        // is_dead
+        getline(ss, token, ',');
+        is_dead = (stoi(token) == 1);
+        // in_jail
+        getline(ss, token, ',');
+        in_jail = (stoi(token) == 1);
+        // was_boss
+        getline(ss, token, ',');
+        was_boss = (stoi(token) == 1);
+        // is_boss
+        getline(ss, token, ',');
+        is_boss = (stoi(token) == 1);
+
+        Member* new_member = new Member(id, name, last_name, gender, age, id_boss, is_dead, in_jail,
+                                        was_boss, is_boss);
 
         if (new_member->m_id_boss == 0) {
             if (m_root == nullptr) {
@@ -175,8 +161,10 @@ void FamilyTree::load_from_csv(const string& filename) {
             if (boss != nullptr) {
                 // enlazar al jefe
                 new_member->m_boss = boss;
-                if (boss->m_left == nullptr) boss->m_left = new_member;
-                else if (boss->m_right == nullptr) boss->m_right = new_member;
+                if (boss->m_left == nullptr)
+                    boss->m_left = new_member;
+                else if (boss->m_right == nullptr)
+                    boss->m_right = new_member;
                 else {
                     cerr << "Jefe " << boss->m_id << " ya tiene dos hijos.\n";
                     delete new_member;
@@ -210,7 +198,8 @@ void FamilyTree::load_from_csv(const string& filename) {
 
     while (!m_orphan_queue.empty()) {
         Member* m = m_orphan_queue.pop();
-        cerr << "Huérfano sin jefe: " << m->m_id << " (jefe " << m->m_id_boss << " no encontrado)\n";
+        cerr << "Huérfano sin jefe: " << m->m_id << " (jefe " << m->m_id_boss
+             << " no encontrado)\n";
         delete m; // Se liberan al no poder almacenarse
     }
 }
@@ -224,7 +213,8 @@ void FamilyTree::edit_member(int id) {
 
     bool editing = true;
     while (editing) {
-        cout << "\n--- Editando a " << member->m_name << " " << member->m_last_name << " (ID: " << member->m_id << ") ---\n";
+        cout << "\n--- Editando a " << member->m_name << " " << member->m_last_name
+             << " (ID: " << member->m_id << ") ---\n";
         cout << "1. Nombre: " << member->m_name << "\n";
         cout << "2. Apellido: " << member->m_last_name << "\n";
         cout << "3. Genero: " << member->m_gender << "\n";
@@ -241,69 +231,72 @@ void FamilyTree::edit_member(int id) {
         cin.ignore();
 
         switch (option) {
-        case 1: {
-            cout << "Ingrese nuevo nombre: ";
-            getline(cin, member->m_name);
-            break;
-        }
-        case 2: {
-            cout << "Ingrese nuevo apellido: ";
-            getline(cin, member->m_last_name);
-            break;
-        }
-        case 3: {
-            char g;
-            while (true) {
-                cout << "Ingrese nuevo genero (H/M): ";
-                cin >> g;
-                cin.ignore();
-                if (g == 'H' || g == 'M') {
-                    member->m_gender = g;
-                    break;
-                }
-                cout << "Error: solo H o M\n";
+            case 1: {
+                cout << "Ingrese nuevo nombre: ";
+                getline(cin, member->m_name);
+                break;
             }
-            break;
-        }
-        case 4: {
-            int a;
-            while (true) {
-                cout << "Ingrese nueva edad: ";
-                cin >> a;
-                cin.ignore();
-                if (a > 0 && a < 150) {
-                    member->m_age = a;
-                    break;
-                }
-                cout << "Error: edad fuera de rango.\n";
+            case 2: {
+                cout << "Ingrese nuevo apellido: ";
+                getline(cin, member->m_last_name);
+                break;
             }
-            break;
-        }
-        case 5: {
-            member->m_is_dead = !member->m_is_dead;
-            cout << "Estado cambiado a: " << (member->m_is_dead ? "Muerto" : "Vivo") << "\n";
-            break;
-        }
-        case 6: {
-            member->m_in_jail = !member->m_in_jail;
-            cout << "Estado cambiado a: " << (member->m_in_jail ? "En prision" : "Libre") << "\n";
-            break;
-        }
-        case 7: {
-            member->m_was_boss = !member->m_was_boss;
-            cout << "Estado cambiado a: " << (member->m_was_boss ? "Fue jefe" : "No fue jefe") << "\n";
-            break;
-        }
-        case 8: {
-            member->m_is_boss = !member->m_is_boss;
-            cout << "Estado cambiado a: " << (member->m_is_boss ? "Es jefe" : "Ya no es jefe") << "\n";
-            break;
-        }
-        case 0:
-            editing = false;
-            break;
-        default:
-            cout << "Opcion invalida\n";
+            case 3: {
+                char g;
+                while (true) {
+                    cout << "Ingrese nuevo genero (H/M): ";
+                    cin >> g;
+                    cin.ignore();
+                    if (g == 'H' || g == 'M') {
+                        member->m_gender = g;
+                        break;
+                    }
+                    cout << "Error: solo H o M\n";
+                }
+                break;
+            }
+            case 4: {
+                int a;
+                while (true) {
+                    cout << "Ingrese nueva edad: ";
+                    cin >> a;
+                    cin.ignore();
+                    if (a > 0 && a < 150) {
+                        member->m_age = a;
+                        break;
+                    }
+                    cout << "Error: edad fuera de rango.\n";
+                }
+                break;
+            }
+            case 5: {
+                member->m_is_dead = !member->m_is_dead;
+                cout << "Estado cambiado a: " << (member->m_is_dead ? "Muerto" : "Vivo") << "\n";
+                break;
+            }
+            case 6: {
+                member->m_in_jail = !member->m_in_jail;
+                cout << "Estado cambiado a: " << (member->m_in_jail ? "En prision" : "Libre")
+                     << "\n";
+                break;
+            }
+            case 7: {
+                member->m_was_boss = !member->m_was_boss;
+                cout << "Estado cambiado a: " << (member->m_was_boss ? "Fue jefe" : "No fue jefe")
+                     << "\n";
+                break;
+            }
+            case 8: {
+                member->m_is_boss = !member->m_is_boss;
+                cout << "Estado cambiado a: " << (member->m_is_boss ? "Es jefe" : "Ya no es jefe")
+                     << "\n";
+                break;
+            }
+            case 0:
+                editing = false;
+                break;
+            default:
+                cout << "Opcion invalida\n";
         }
     }
 }
