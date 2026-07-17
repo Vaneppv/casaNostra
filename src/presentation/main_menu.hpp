@@ -24,7 +24,7 @@ private:
 
 public:
     // move() safely moves title ownership to this class' instance
-    MainMenu(std::string title, FamilyTree* tree) : m_title(std::move(title)), m_tree(tree) {};
+    MainMenu(std::string title, FamilyTree* tree);
     ~MainMenu() = default;
 
     void show_menu();
