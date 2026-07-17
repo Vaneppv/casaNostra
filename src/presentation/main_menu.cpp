@@ -37,6 +37,7 @@ void MainMenu::set_option(int index, const char* desc, std::function<void()> act
     if (index >= 0 && index < MainMenu::MAX_OPTIONS) {
         this->m_options[index].description = desc;
         this->m_options[index].action = action;
+        this->m_num_options++;
     }
 }
 

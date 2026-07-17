@@ -34,5 +34,5 @@ public:
     void set_title(const std::string& title);
     std::string get_title() const { return m_title; }
     void set_exit_text(const std::string& text);
-    bool set_option(int index, const char* desc, std::function<void()> action);
+    void set_option(int index, const char* desc, std::function<void()> action);
 };
