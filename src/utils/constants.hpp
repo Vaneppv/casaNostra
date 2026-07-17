@@ -2,6 +2,7 @@
 #include <string_view>
 
 namespace Constants::ASCII_CODES {
+constexpr const int MAX_AGE = 70;
 constexpr std::string_view CLEAR_SCREEN = "\033[2J\033[H";
 constexpr std::string_view COLOR_RESET = "\033[0m";
 constexpr std::string_view COLOR_RED = "\033[31m";
