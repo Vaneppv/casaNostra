@@ -45,3 +45,46 @@ bool MainMenu::confirm_action(const std::string& prompt) {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     return confirm == 's' || confirm == 'S';
 }
+
+void MainMenu::show_menu() {
+    if (this->m_options.size() <= 0) {
+        return;
+    }
+
+    int option = -1;
+    do {
+        std::cout << COLOR_CYAN << "\n=== " << m_title << " ===" << COLOR_RESET << "\n";
+        for (int i = 0; i < m_num_options; ++i) {
+            std::cout << COLOR_YELLOW << i + 1 << "." << COLOR_RESET << " "
+                      << m_options[i].description << "\n";
+        }
+        std::cout << COLOR_RED << "0." << COLOR_RESET << " " << m_exit_text << "\n";
+        std::cout << COLOR_YELLOW << "Seleccione una opción: ";
+
+        if (!(std::cin >> option) || std::cin.peek() != '\n') {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << COLOR_RED << "Opción inválida. Debe ser numérica." << COLOR_RESET << "\n";
+            continue;
+        }
+
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        if (option < 0 || option > m_num_options) {
+            std::cout << COLOR_RED << "Opción inválida" << COLOR_RESET << std::endl;
+            continue;
+        }
+
+        int index = option - 1;
+        if (index >= 0 && index < m_num_options && m_options[index].action != nullptr) {
+            m_options[index].action();
+        }
+
+        // Si el indice es -1 ((index = 0) -1) se sale del menu
+        if (index == -1) {
+            std::cout << COLOR_GREEN
+                      << (tolower(m_exit_text[0]) == 's' ? "Saliendo..." : "Volviendo...")
+                      << COLOR_RESET << "\n";
+            break;
+        }
+    } while (option != 0);
+}
