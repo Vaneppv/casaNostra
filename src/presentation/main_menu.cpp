@@ -48,6 +48,13 @@ bool MainMenu::confirm_action(const std::string& prompt) {
     return confirm == 's' || confirm == 'S';
 }
 
+std::string MainMenu::prompt_input(const std::string& prompt) {
+    std::cout << COLOR_YELLOW << prompt << COLOR_RESET;
+    std::string value;
+    std::getline(std::cin >> std::ws, value);
+    return value;
+}
+
 void MainMenu::show_menu() {
     if (m_num_options <= 0) {
         return;

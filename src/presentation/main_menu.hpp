@@ -29,6 +29,7 @@ public:
 
     void show_menu();
     bool confirm_action(const std::string& prompt);
+    std::string prompt_input(const std::string& prompt);
     void print_success(const std::string& message) const;
     void print_error(const std::string& error) const;
     void set_title(const std::string& title);
