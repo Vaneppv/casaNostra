@@ -1,3 +1,4 @@
+#pragma once
 #include <string_view>
 
 namespace Constants::ASCII_CODES {

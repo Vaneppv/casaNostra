@@ -1,3 +1,4 @@
+#pragma once
 #include "../member/member.hpp"
 
 class OrphanNode {

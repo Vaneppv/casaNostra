@@ -1,5 +1,7 @@
 #include "main_menu.hpp"
 
+#include <array>
+#include <cctype>
 #include <iostream>
 #include <limits>
 

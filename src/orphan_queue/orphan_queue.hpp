@@ -1,3 +1,4 @@
+#pragma once
 #include "../orphan_node/orphan_node.hpp"
 
 class OrphanQueue {
