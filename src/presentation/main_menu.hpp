@@ -27,11 +27,11 @@ public:
     ~MainMenu() = default;
 
     void show_menu();
-    bool confirm_action(const char* prompt);
+    bool confirm_action(const std::string& prompt);
     void print_success(const std::string& message) const;
     void print_error(const std::string& error) const;
     void set_title(const std::string& title);
+    std::string get_title() const { return m_title; }
     void set_exit_text(const std::string& text);
-    void set_num_options(int n);
     bool set_option(int index, const char* desc, std::function<void()> action);
 };
