@@ -22,10 +22,11 @@ public:
     Member* m_left = nullptr;
     Member* m_right = nullptr;
 
-    Member(int id, std::string name, std::string last, char gender, int age, int id_b, bool dead, bool jail, bool was_b,
-           bool is_b)
-        : m_id(id), m_name(std::move(name)), m_last_name(std::move(last)), m_gender(gender), m_age(age),
-          m_id_boss(id_b), m_is_dead(dead), m_in_jail(jail), m_was_boss(was_b), m_is_boss(is_b) {}
+    Member(int id, std::string name, std::string last, char gender,
+           int age, int id_b, bool dead, bool jail, bool was_b, bool is_b)
+        : m_id(id), m_name(std::move(name)), m_last_name(std::move(last)),
+          m_gender(gender), m_age(age), m_id_boss(id_b), m_is_dead(dead),
+          m_in_jail(jail), m_was_boss(was_b), m_is_boss(is_b) {}
 };
 
 class OrphanNode {
@@ -65,6 +66,7 @@ private:
 
     void delete_tree(Member* node); 
     Member* find_member_by_id_rec(Member* node, int id) const;
+    Member* find_first_alive_free(Member* node) const;
     void attach_orphans();  
 
 public:
