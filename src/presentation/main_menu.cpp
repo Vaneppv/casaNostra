@@ -29,15 +29,14 @@ void MainMenu::set_exit_text(const std::string& text) {
     if (text.empty()) {
         return;
     }
-
     this->m_exit_text = text;
 }
 
-void MainMenu::set_option(int index, const char* desc, std::function<void()> action) {
-    if (index >= 0 && index < MainMenu::MAX_OPTIONS) {
-        this->m_options[index].description = desc;
-        this->m_options[index].action = action;
-        this->m_num_options++;
+void MainMenu::set_option(const char* desc, std::function<void()> action) {
+    if (m_num_options < MAX_OPTIONS) {
+        m_options[m_num_options].description = desc;
+        m_options[m_num_options].action = action;
+        m_num_options++;
     }
 }
 
@@ -50,7 +49,7 @@ bool MainMenu::confirm_action(const std::string& prompt) {
 }
 
 void MainMenu::show_menu() {
-    if (this->m_options.size() <= 0) {
+    if (m_num_options <= 0) {
         return;
     }
 
