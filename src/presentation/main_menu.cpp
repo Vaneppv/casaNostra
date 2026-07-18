@@ -40,6 +40,8 @@ MainMenu::MainMenu(std::string title, FamilyTree* tree) : m_title(std::move(titl
             print_error("ID fuera de rango.");
         }
     });
+
+    set_option("Ver línea de sucesión", [this]() { m_tree->show_succession(); });
 }
 
 void MainMenu::print_error(const std::string& error) const {

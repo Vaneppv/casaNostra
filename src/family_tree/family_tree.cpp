@@ -225,7 +225,7 @@ void FamilyTree::show_succession_rec(Member* node, int& position) const {
 
     if (!node->m_is_dead) {
         std::cout << position << ". " << node->m_name << " " << node->m_last_name
-                  << " (ID: " << node->m_id << ", " << node->m_age << " anios)";
+                  << " (ID: " << node->m_id << ", " << node->m_age << " años)";
         if (node->m_is_boss) std::cout << " — Jefe actual";
         if (node->m_in_jail) std::cout << " — En prision";
         if (node->m_was_boss) std::cout << " — Exjefe";
