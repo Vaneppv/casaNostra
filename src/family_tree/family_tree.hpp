@@ -24,5 +24,6 @@ public:
     Member* get_root() const { return m_root; }
     void load_from_csv(const std::string& filename);
     Member* find_member_by_id(int id) const;
+    void check_and_assign_boss();
     void edit_member(int id);
 };

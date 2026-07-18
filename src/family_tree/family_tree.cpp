@@ -358,6 +358,47 @@ void FamilyTree::load_from_csv(const string& filename) {
     }
 }
 
+void FamilyTree::check_and_assign_boss() {
+    Member* boss = find_current_boss(m_root);
+    if (boss == nullptr) {
+        cout << "No hay un jefe actual\n";
+        return;
+    }
+
+    if (!boss->m_is_dead && boss->m_age <= MAX_AGE
+        && !boss->m_in_jail) {
+        return;
+    }
+
+    cout << "El jefe " << boss->m_name << " " << boss->m_last_name
+         << " necesita ser reemplazado";
+
+    if (boss->m_is_dead) { cout << " (fallecido)"; }
+    else if (boss->m_in_jail) { cout << " (en prision)"; }
+    if (boss->m_age > MAX_AGE) {
+        cout << " (mayor de " << MAX_AGE << " anios)";
+    }
+    cout << "\n";
+
+    Member* candidate = find_successor(boss, true);
+    if (candidate == nullptr) {
+        candidate = find_successor(boss, false);
+    }
+
+    if (candidate == nullptr) {
+        cout << "No se pudo encontrar un sucesor adecuado\n";
+        return;
+    }
+
+    boss->m_is_boss = false;
+    boss->m_was_boss = true;
+    candidate->m_is_boss = true;
+
+    cout << "Nuevo jefe asignado: " << candidate->m_name << " "
+         << candidate->m_last_name
+         << " (ID: " << candidate->m_id << ")\n";
+}
+
 void FamilyTree::edit_member(int id) {
     Member* member = find_member_by_id(id);
     if (member == nullptr) {
