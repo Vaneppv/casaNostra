@@ -42,6 +42,10 @@ MainMenu::MainMenu(std::string title, FamilyTree* tree) : m_title(std::move(titl
     });
 
     set_option("Ver línea de sucesión", [this]() { m_tree->show_succession(); });
+
+    set_option("Reasignar jefe automáticamente", [this]() {
+        m_tree->check_and_assign_boss();
+    });
 }
 
 void MainMenu::print_error(const std::string& error) const {
