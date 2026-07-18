@@ -34,6 +34,7 @@ El menú principal permite:
 
 1. **Cargar datos desde CSV** — Lee `bin/datos.csv` y construye el árbol binario.
 2. **Editar miembro** — Modifica los campos de un miembro por su ID.
+3. **Ver línea de sucesión** — Muestra la línea de sucesión actual (solo vivos).
 
 El programa se ejecuta hasta que el usuario selecciona "Salir".
 
@@ -56,8 +57,9 @@ src/
   orphan_queue/
     orphan_queue.hpp     # Cola FIFO para miembros sin jefe
     orphan_queue.cpp
-  presentation/
+  utils/
     constants.hpp        # Códigos de color ANSI
+  presentation/
     main_menu.hpp        # Clase MainMenu
     main_menu.cpp        # Menú principal con opciones
 ```
@@ -78,8 +80,5 @@ id,name,last_name,gender,age,id_boss,is_dead,in_jail,was_boss,is_boss
 - Edición de miembros (nombre, apellido, género, edad, estado)
 - Reasignación automática de huérfanos al insertar su jefe
 - Búsqueda de sucesores vivos (libres y en prisión)
-
-## Funcionalidades pendientes
-
 - Mostrar línea de sucesión actual (solo miembros vivos)
 - Asignación automática de jefe ante muerte, prisión o edad ≥ 70
