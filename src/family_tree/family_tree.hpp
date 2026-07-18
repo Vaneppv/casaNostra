@@ -15,7 +15,8 @@ private:
     Member* find_first_alive_jailed(Member* node) const;
     Member* find_current_boss(Member* node) const;
     Member* find_successor(Member* boss, bool search_free) const;
-    Member* find_nearest_boss_with_two(Member* boss,bool search_free) const;
+    Member* find_nearest_boss_with_two(Member* boss, bool search_free) const;
+    void show_succession_rec(Member* node, int& position) const;
     void attach_orphans();
 
 public:
@@ -26,4 +27,5 @@ public:
     Member* find_member_by_id(int id) const;
     void check_and_assign_boss();
     void edit_member(int id);
+    void show_succession() const;
 };

@@ -10,6 +10,7 @@ void FamilyTree::delete_tree(Member* node) {
     if (node == nullptr) return;
     delete_tree(node->m_left);
     delete_tree(node->m_right);
+
     delete node;
 }
 
@@ -59,22 +60,22 @@ Member* FamilyTree::find_first_alive_jailed(Member* node) const {
 }
 
 Member* FamilyTree::find_current_boss(Member* node) const {
-    if (node == nullptr) { 
-        return nullptr; 
+    if (node == nullptr) {
+        return nullptr;
     }
-    if (node->m_is_boss) { 
-        return node; 
+    if (node->m_is_boss) {
+        return node;
     }
     Member* found = find_current_boss(node->m_left);
-    if (found != nullptr) { 
-        return found; 
+    if (found != nullptr) {
+        return found;
     }
     return find_current_boss(node->m_right);
 }
 
 Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
-    if (boss == nullptr) { 
-        return nullptr; 
+    if (boss == nullptr) {
+        return nullptr;
     }
 
     Member* succ;
@@ -90,12 +91,13 @@ Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
             succ = find_first_alive_jailed(boss->m_right);
         }
     }
-    if (succ != nullptr) { return succ; }
+    if (succ != nullptr) {
+        return succ;
+    }
 
     if (boss->m_boss != nullptr) {
-        Member* partner = (boss->m_boss->m_left == boss)
-                              ? boss->m_boss->m_right
-                              : boss->m_boss->m_left;
+        Member* partner =
+            (boss->m_boss->m_left == boss) ? boss->m_boss->m_right : boss->m_boss->m_left;
         if (partner != nullptr) {
             if (search_free) {
                 succ = find_first_alive_free(partner->m_left);
@@ -108,7 +110,9 @@ Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
                     succ = find_first_alive_jailed(partner->m_right);
                 }
             }
-            if (succ != nullptr) { return succ; }
+            if (succ != nullptr) {
+                return succ;
+            }
 
             if (!partner->m_is_dead) {
                 if (search_free && !partner->m_in_jail) {
@@ -123,25 +127,23 @@ Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
 
     if (boss->m_boss != nullptr && boss->m_boss->m_boss != nullptr) {
         Member* grand_boss = boss->m_boss->m_boss;
-        Member* grand_partner = (grand_boss->m_left == boss->m_boss)
-                                    ? grand_boss->m_right
-                                    : grand_boss->m_left;
+        Member* grand_partner =
+            (grand_boss->m_left == boss->m_boss) ? grand_boss->m_right : grand_boss->m_left;
         if (grand_partner != nullptr) {
             if (search_free) {
                 succ = find_first_alive_free(grand_partner->m_left);
                 if (succ == nullptr) {
-                    succ = find_first_alive_free(
-                        grand_partner->m_right);
+                    succ = find_first_alive_free(grand_partner->m_right);
                 }
             } else {
-                succ = find_first_alive_jailed(
-                    grand_partner->m_left);
+                succ = find_first_alive_jailed(grand_partner->m_left);
                 if (succ == nullptr) {
-                    succ = find_first_alive_jailed(
-                        grand_partner->m_right);
+                    succ = find_first_alive_jailed(grand_partner->m_right);
                 }
             }
-            if (succ != nullptr) { return succ; }
+            if (succ != nullptr) {
+                return succ;
+            }
 
             if (!grand_partner->m_is_dead) {
                 if (search_free && !grand_partner->m_in_jail) {
@@ -157,15 +159,13 @@ Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
     return find_nearest_boss_with_two(boss, search_free);
 }
 
-Member* FamilyTree::find_nearest_boss_with_two(
-    Member* boss, bool search_free) const {
+Member* FamilyTree::find_nearest_boss_with_two(Member* boss, bool search_free) const {
     Member* current = boss->m_boss;
     while (current != nullptr) {
         bool left_ok = false;
         bool right_ok = false;
 
-        if (current->m_left != nullptr
-            && !current->m_left->m_is_dead) {
+        if (current->m_left != nullptr && !current->m_left->m_is_dead) {
             if (search_free && !current->m_left->m_in_jail) {
                 left_ok = true;
             }
@@ -173,8 +173,7 @@ Member* FamilyTree::find_nearest_boss_with_two(
                 left_ok = true;
             }
         }
-        if (current->m_right != nullptr
-            && !current->m_right->m_is_dead) {
+        if (current->m_right != nullptr && !current->m_right->m_is_dead) {
             if (search_free && !current->m_right->m_in_jail) {
                 right_ok = true;
             }
@@ -184,25 +183,19 @@ Member* FamilyTree::find_nearest_boss_with_two(
         }
 
         if (left_ok && right_ok) {
-            if (current->m_left != nullptr
-                && !current->m_left->m_is_dead) {
-                if (search_free
-                    && !current->m_left->m_in_jail) {
+            if (current->m_left != nullptr && !current->m_left->m_is_dead) {
+                if (search_free && !current->m_left->m_in_jail) {
                     return current->m_left;
                 }
-                if (!search_free
-                    && current->m_left->m_in_jail) {
+                if (!search_free && current->m_left->m_in_jail) {
                     return current->m_left;
                 }
             }
-            if (current->m_right != nullptr
-                && !current->m_right->m_is_dead) {
-                if (search_free
-                    && !current->m_right->m_in_jail) {
+            if (current->m_right != nullptr && !current->m_right->m_is_dead) {
+                if (search_free && !current->m_right->m_in_jail) {
                     return current->m_right;
                 }
-                if (!search_free
-                    && current->m_right->m_in_jail) {
+                if (!search_free && current->m_right->m_in_jail) {
                     return current->m_right;
                 }
             }
@@ -210,6 +203,34 @@ Member* FamilyTree::find_nearest_boss_with_two(
         current = current->m_boss;
     }
     return nullptr;
+}
+
+void FamilyTree::show_succession() const {
+    if (m_root == nullptr) {
+        std::cout << "El arbol esta vacio. Cargue datos primero.\n";
+        return;
+    }
+    std::cout << "\n--- Linea de Sucesion (solo vivos) ---\n";
+    int position = 1;
+    show_succession_rec(m_root, position);
+}
+
+void FamilyTree::show_succession_rec(Member* node, int& position) const {
+    if (node == nullptr) {
+        return;
+    }
+
+    if (!node->m_is_dead) {
+        std::cout << position << ". " << node->m_name << " " << node->m_last_name
+                  << " (ID: " << node->m_id << ", " << node->m_age << " anios)";
+        if (node->m_is_boss) std::cout << " — Jefe actual";
+        if (node->m_in_jail) std::cout << " — En prision";
+        if (node->m_was_boss) std::cout << " — Exjefe";
+        std::cout << "\n";
+        position++;
+    }
+    show_succession_rec(node->m_left, position);
+    show_succession_rec(node->m_right, position);
 }
 
 void FamilyTree::attach_orphans() {
@@ -365,16 +386,17 @@ void FamilyTree::check_and_assign_boss() {
         return;
     }
 
-    if (!boss->m_is_dead && boss->m_age <= MAX_AGE
-        && !boss->m_in_jail) {
+    if (!boss->m_is_dead && boss->m_age <= MAX_AGE && !boss->m_in_jail) {
         return;
     }
 
-    cout << "El jefe " << boss->m_name << " " << boss->m_last_name
-         << " necesita ser reemplazado";
+    cout << "El jefe " << boss->m_name << " " << boss->m_last_name << " necesita ser reemplazado";
 
-    if (boss->m_is_dead) { cout << " (fallecido)"; }
-    else if (boss->m_in_jail) { cout << " (en prision)"; }
+    if (boss->m_is_dead) {
+        cout << " (fallecido)";
+    } else if (boss->m_in_jail) {
+        cout << " (en prision)";
+    }
     if (boss->m_age > MAX_AGE) {
         cout << " (mayor de " << MAX_AGE << " anios)";
     }
@@ -394,8 +416,7 @@ void FamilyTree::check_and_assign_boss() {
     boss->m_was_boss = true;
     candidate->m_is_boss = true;
 
-    cout << "Nuevo jefe asignado: " << candidate->m_name << " "
-         << candidate->m_last_name
+    cout << "Nuevo jefe asignado: " << candidate->m_name << " " << candidate->m_last_name
          << " (ID: " << candidate->m_id << ")\n";
 }
 
