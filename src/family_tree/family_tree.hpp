@@ -15,6 +15,7 @@ private:
     Member* find_first_alive_jailed(Member* node) const;
     Member* find_current_boss(Member* node) const;
     Member* find_successor(Member* boss, bool search_free) const;
+    Member* find_nearest_boss_with_two(Member* boss,bool search_free) const;
     void attach_orphans();
 
 public:

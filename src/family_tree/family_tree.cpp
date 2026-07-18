@@ -157,6 +157,61 @@ Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
     return find_nearest_boss_with_two(boss, search_free);
 }
 
+Member* FamilyTree::find_nearest_boss_with_two(
+    Member* boss, bool search_free) const {
+    Member* current = boss->m_boss;
+    while (current != nullptr) {
+        bool left_ok = false;
+        bool right_ok = false;
+
+        if (current->m_left != nullptr
+            && !current->m_left->m_is_dead) {
+            if (search_free && !current->m_left->m_in_jail) {
+                left_ok = true;
+            }
+            if (!search_free && current->m_left->m_in_jail) {
+                left_ok = true;
+            }
+        }
+        if (current->m_right != nullptr
+            && !current->m_right->m_is_dead) {
+            if (search_free && !current->m_right->m_in_jail) {
+                right_ok = true;
+            }
+            if (!search_free && current->m_right->m_in_jail) {
+                right_ok = true;
+            }
+        }
+
+        if (left_ok && right_ok) {
+            if (current->m_left != nullptr
+                && !current->m_left->m_is_dead) {
+                if (search_free
+                    && !current->m_left->m_in_jail) {
+                    return current->m_left;
+                }
+                if (!search_free
+                    && current->m_left->m_in_jail) {
+                    return current->m_left;
+                }
+            }
+            if (current->m_right != nullptr
+                && !current->m_right->m_is_dead) {
+                if (search_free
+                    && !current->m_right->m_in_jail) {
+                    return current->m_right;
+                }
+                if (!search_free
+                    && current->m_right->m_in_jail) {
+                    return current->m_right;
+                }
+            }
+        }
+        current = current->m_boss;
+    }
+    return nullptr;
+}
+
 void FamilyTree::attach_orphans() {
     bool progress;
     do {
