@@ -4,7 +4,10 @@
 #include <iostream>
 #include <sstream>
 
+#include "../utils/constants.hpp"
+
 using namespace std;
+using namespace Constants::ASCII_CODES;
 
 void FamilyTree::delete_tree(Member* node) {
     if (node == nullptr) return;
