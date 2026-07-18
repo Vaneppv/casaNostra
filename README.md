@@ -14,15 +14,14 @@ Realizado por [Jonner Paz](https://github.com/JonnerPaz) y [Vanessa Pérez](http
 Para compilar, copia y pega el siguiente commando en la consola:
 
 ```bash
-g++ -std=c++20 -o bin/casa_nostra \
-    src/main.cpp \
-    src/family_tree/family_tree.cpp \
-    src/orphan_queue/orphan_queue.cpp \
-    src/orphan_node/orphan_node.cpp \
-    src/presentation/main_menu.cpp
+make
 ```
 
-De momento no hay makefile, así que hay que trabajar con lo que hay.
+Para compilar y correr el proyecto:
+
+```bash
+make run
+```
 
 ## Uso
 
