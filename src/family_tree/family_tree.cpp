@@ -72,6 +72,91 @@ Member* FamilyTree::find_current_boss(Member* node) const {
     return find_current_boss(node->m_right);
 }
 
+Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
+    if (boss == nullptr) { 
+        return nullptr; 
+    }
+
+    Member* succ;
+
+    if (search_free) {
+        succ = find_first_alive_free(boss->m_left);
+        if (succ == nullptr) {
+            succ = find_first_alive_free(boss->m_right);
+        }
+    } else {
+        succ = find_first_alive_jailed(boss->m_left);
+        if (succ == nullptr) {
+            succ = find_first_alive_jailed(boss->m_right);
+        }
+    }
+    if (succ != nullptr) { return succ; }
+
+    if (boss->m_boss != nullptr) {
+        Member* partner = (boss->m_boss->m_left == boss)
+                              ? boss->m_boss->m_right
+                              : boss->m_boss->m_left;
+        if (partner != nullptr) {
+            if (search_free) {
+                succ = find_first_alive_free(partner->m_left);
+                if (succ == nullptr) {
+                    succ = find_first_alive_free(partner->m_right);
+                }
+            } else {
+                succ = find_first_alive_jailed(partner->m_left);
+                if (succ == nullptr) {
+                    succ = find_first_alive_jailed(partner->m_right);
+                }
+            }
+            if (succ != nullptr) { return succ; }
+
+            if (!partner->m_is_dead) {
+                if (search_free && !partner->m_in_jail) {
+                    return partner;
+                }
+                if (!search_free && partner->m_in_jail) {
+                    return partner;
+                }
+            }
+        }
+    }
+
+    if (boss->m_boss != nullptr && boss->m_boss->m_boss != nullptr) {
+        Member* grand_boss = boss->m_boss->m_boss;
+        Member* grand_partner = (grand_boss->m_left == boss->m_boss)
+                                    ? grand_boss->m_right
+                                    : grand_boss->m_left;
+        if (grand_partner != nullptr) {
+            if (search_free) {
+                succ = find_first_alive_free(grand_partner->m_left);
+                if (succ == nullptr) {
+                    succ = find_first_alive_free(
+                        grand_partner->m_right);
+                }
+            } else {
+                succ = find_first_alive_jailed(
+                    grand_partner->m_left);
+                if (succ == nullptr) {
+                    succ = find_first_alive_jailed(
+                        grand_partner->m_right);
+                }
+            }
+            if (succ != nullptr) { return succ; }
+
+            if (!grand_partner->m_is_dead) {
+                if (search_free && !grand_partner->m_in_jail) {
+                    return grand_partner;
+                }
+                if (!search_free && grand_partner->m_in_jail) {
+                    return grand_partner;
+                }
+            }
+        }
+    }
+
+    return find_nearest_boss_with_two(boss, search_free);
+}
+
 void FamilyTree::attach_orphans() {
     bool progress;
     do {
