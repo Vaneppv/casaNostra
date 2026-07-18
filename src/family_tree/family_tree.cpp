@@ -58,6 +58,20 @@ Member* FamilyTree::find_first_alive_jailed(Member* node) const {
     return find_first_alive_jailed(node->m_right);
 }
 
+Member* FamilyTree::find_current_boss(Member* node) const {
+    if (node == nullptr) { 
+        return nullptr; 
+    }
+    if (node->m_is_boss) { 
+        return node; 
+    }
+    Member* found = find_current_boss(node->m_left);
+    if (found != nullptr) { 
+        return found; 
+    }
+    return find_current_boss(node->m_right);
+}
+
 void FamilyTree::attach_orphans() {
     bool progress;
     do {

@@ -13,6 +13,7 @@ private:
     Member* find_member_by_id_rec(Member* node, int id) const;
     Member* find_first_alive_free(Member* node) const;
     Member* find_first_alive_jailed(Member* node) const;
+    Member* find_current_boss(Member* node) const;
     void attach_orphans();
 
 public:
