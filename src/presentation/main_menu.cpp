@@ -4,7 +4,6 @@
 #include <cctype>
 #include <iostream>
 #include <limits>
-#include <stdexcept>
 
 #include "../utils/constants.hpp"
 
@@ -12,40 +11,6 @@ using namespace Constants::ASCII_CODES;
 
 MainMenu::MainMenu(std::string title, FamilyTree* tree) : m_title(std::move(title)), m_tree(tree) {
     set_exit_text("Salir");
-
-    set_option("Cargar datos desde CSV", [this]() {
-        m_tree->load_from_csv("bin/datos.csv");
-        print_success("Datos cargados correctamente.");
-    });
-
-    set_option("Editar miembro", [this]() {
-        std::string input = prompt_input("Ingrese ID del miembro: ");
-
-        if (input.empty()) {
-            print_error("ID no válido.");
-            return;
-        }
-
-        try {
-            size_t pos;
-            int member_id = std::stoi(input, &pos);
-            if (pos != input.length()) {
-                print_error("ID debe ser un número entero.");
-                return;
-            }
-            m_tree->edit_member(member_id);
-        } catch (const std::invalid_argument&) {
-            print_error("ID debe ser un número entero.");
-        } catch (const std::out_of_range&) {
-            print_error("ID fuera de rango.");
-        }
-    });
-
-    set_option("Ver línea de sucesión", [this]() { m_tree->show_succession(); });
-
-    set_option("Reasignar jefe automáticamente", [this]() {
-        m_tree->check_and_assign_boss();
-    });
 }
 
 void MainMenu::print_error(const std::string& error) const {
