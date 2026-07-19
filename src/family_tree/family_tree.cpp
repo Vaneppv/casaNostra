@@ -239,9 +239,12 @@ bool FamilyTree::load_from_csv(const string& filename) {
 
     // cabecera
     string line;
-    getline(file, line);
+    do {
+        getline(file, line);
+    } while (!file.eof() && (line.empty() || line[0] == '#'));
 
     while (getline(file, line)) {
+        if (line.empty() || line[0] == '#') continue;
         Member* new_member = CSVParser::parse_csv_line(line);
 
         if (new_member->m_id_boss == 0) {
