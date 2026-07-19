@@ -185,6 +185,21 @@ void FamilyTree::show_succession_rec(Member* node, int& position) const {
     show_succession_rec(node->m_right, position);
 }
 
+bool FamilyTree::attach_member_to_boss(Member* member, Member* boss) {
+    member->m_boss = boss;
+    if (boss->m_left == nullptr) {
+        boss->m_left = member;
+        return true;
+    }
+    if (boss->m_right == nullptr) {
+        boss->m_right = member;
+        return true;
+    }
+    cerr << "Jefe " << boss->m_id << " ya tiene dos hijos.\n";
+    delete member;
+    return false;
+}
+
 void FamilyTree::attach_orphans() {
     bool progress;
     do {
@@ -194,17 +209,9 @@ void FamilyTree::attach_orphans() {
             Member* m = m_orphan_queue.pop();
             Member* boss = find_member_by_id(m->m_id_boss);
             if (boss != nullptr) {
-                m->m_boss = boss;
-                if (boss->m_left == nullptr)
-                    boss->m_left = m;
-                else if (boss->m_right == nullptr)
-                    boss->m_right = m;
-                else {
-                    cerr << "Jefe " << boss->m_id << " lleno al intentar agregar a " << m->m_id
-                         << "\n";
-                    delete m; // no podemos agregarlo, se descarta
+                if (attach_member_to_boss(m, boss)) {
+                    progress = true;
                 }
-                progress = true;
             } else {
                 temp.push(m); // vuelve a la cola temporal
             }
@@ -248,15 +255,8 @@ void FamilyTree::load_from_csv(const string& filename) {
         } else {
             Member* boss = find_member_by_id(new_member->m_id_boss);
             if (boss != nullptr) {
-                // enlazar al jefe
-                new_member->m_boss = boss;
-                if (boss->m_left == nullptr)
-                    boss->m_left = new_member;
-                else if (boss->m_right == nullptr)
-                    boss->m_right = new_member;
-                else {
-                    cerr << "Jefe " << boss->m_id << " ya tiene dos hijos.\n";
-                    delete new_member;
+                if (!attach_member_to_boss(new_member, boss)) {
+                    continue;
                 }
             } else {
                 m_orphan_queue.push(new_member);

@@ -16,6 +16,7 @@ private:
     Member* find_successor(Member* boss, bool search_free) const;
     Member* find_nearest_boss_with_two(Member* boss, bool search_free) const;
     void show_succession_rec(Member* node, int& position) const;
+    bool attach_member_to_boss(Member* member, Member* boss);
     void attach_orphans();
 
 public:
