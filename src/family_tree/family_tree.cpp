@@ -2,19 +2,23 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
+#include "../parser/csv_parser.hpp"
 #include "../utils/constants.hpp"
 
 using namespace std;
 using namespace Constants::ASCII_CODES;
 
 void FamilyTree::delete_tree(Member* node) {
-    if (node == nullptr) return;
+    if (node == nullptr) {
+        return;
+    }
+
     delete_tree(node->m_left);
     delete_tree(node->m_right);
 
     delete node;
+    node = nullptr;
 }
 
 Member* FamilyTree::find_member_by_id_rec(Member* node, int id) const {
@@ -34,32 +38,33 @@ Member* FamilyTree::find_member_by_id(int id) const {
     return find_member_by_id_rec(m_root, id);
 }
 
-Member* FamilyTree::find_first_alive_free(Member* node) const {
+/**
+ *
+ * @brief - Busca el primer miembro vivo en el arbol de la familia
+ * @param node - Raiz del arbol
+ * @param search_free - Busca miembros libres
+ */
+Member* FamilyTree::find_first_alive(Member* node, bool search_free) const {
     if (node == nullptr) {
         return nullptr;
     }
-    if (!node->m_is_dead && !node->m_in_jail) {
-        return node;
-    }
-    Member* found = find_first_alive_free(node->m_left);
-    if (found != nullptr) {
-        return found;
-    }
-    return find_first_alive_free(node->m_right);
-}
 
-Member* FamilyTree::find_first_alive_jailed(Member* node) const {
-    if (node == nullptr) {
-        return nullptr;
+    // El miembro está vivo, retorna el miembro
+    if (!node->m_is_dead) {
+        if (search_free && !node->m_in_jail) {
+            return node;
+        }
+        if (!search_free && node->m_in_jail) {
+            return node;
+        }
     }
-    if (!node->m_is_dead && node->m_in_jail) {
-        return node;
-    }
-    Member* found = find_first_alive_jailed(node->m_left);
+
+    Member* found = find_first_alive(node->m_left, search_free);
     if (found != nullptr) {
         return found;
     }
-    return find_first_alive_jailed(node->m_right);
+
+    return find_first_alive(node->m_right, search_free);
 }
 
 Member* FamilyTree::find_current_boss(Member* node) const {
@@ -81,49 +86,30 @@ Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
         return nullptr;
     }
 
-    Member* succ;
+    Member* successor;
 
-    if (search_free) {
-        succ = find_first_alive_free(boss->m_left);
-        if (succ == nullptr) {
-            succ = find_first_alive_free(boss->m_right);
-        }
-    } else {
-        succ = find_first_alive_jailed(boss->m_left);
-        if (succ == nullptr) {
-            succ = find_first_alive_jailed(boss->m_right);
-        }
+    successor = find_first_alive(boss->m_left, search_free);
+    if (successor == nullptr) {
+        successor = find_first_alive(boss->m_right, search_free);
     }
-    if (succ != nullptr) {
-        return succ;
+    if (successor != nullptr) {
+        return successor;
     }
 
     if (boss->m_boss != nullptr) {
         Member* partner =
             (boss->m_boss->m_left == boss) ? boss->m_boss->m_right : boss->m_boss->m_left;
         if (partner != nullptr) {
-            if (search_free) {
-                succ = find_first_alive_free(partner->m_left);
-                if (succ == nullptr) {
-                    succ = find_first_alive_free(partner->m_right);
-                }
-            } else {
-                succ = find_first_alive_jailed(partner->m_left);
-                if (succ == nullptr) {
-                    succ = find_first_alive_jailed(partner->m_right);
-                }
+            successor = find_first_alive(partner->m_left, search_free);
+            if (successor == nullptr) {
+                successor = find_first_alive(partner->m_right, search_free);
             }
-            if (succ != nullptr) {
-                return succ;
+            if (successor != nullptr) {
+                return successor;
             }
 
-            if (!partner->m_is_dead) {
-                if (search_free && !partner->m_in_jail) {
-                    return partner;
-                }
-                if (!search_free && partner->m_in_jail) {
-                    return partner;
-                }
+            if (find_first_alive(partner, search_free) != nullptr) {
+                return partner;
             }
         }
     }
@@ -133,28 +119,16 @@ Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
         Member* grand_partner =
             (grand_boss->m_left == boss->m_boss) ? grand_boss->m_right : grand_boss->m_left;
         if (grand_partner != nullptr) {
-            if (search_free) {
-                succ = find_first_alive_free(grand_partner->m_left);
-                if (succ == nullptr) {
-                    succ = find_first_alive_free(grand_partner->m_right);
-                }
-            } else {
-                succ = find_first_alive_jailed(grand_partner->m_left);
-                if (succ == nullptr) {
-                    succ = find_first_alive_jailed(grand_partner->m_right);
-                }
+            successor = find_first_alive(grand_partner->m_left, search_free);
+            if (successor == nullptr) {
+                successor = find_first_alive(grand_partner->m_right, search_free);
             }
-            if (succ != nullptr) {
-                return succ;
+            if (successor != nullptr) {
+                return successor;
             }
 
-            if (!grand_partner->m_is_dead) {
-                if (search_free && !grand_partner->m_in_jail) {
-                    return grand_partner;
-                }
-                if (!search_free && grand_partner->m_in_jail) {
-                    return grand_partner;
-                }
+            if (find_first_alive(grand_partner, search_free) != nullptr) {
+                return grand_partner;
             }
         }
     }
@@ -163,47 +137,22 @@ Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
 }
 
 Member* FamilyTree::find_nearest_boss_with_two(Member* boss, bool search_free) const {
-    Member* current = boss->m_boss;
-    while (current != nullptr) {
-        bool left_ok = false;
-        bool right_ok = false;
-
-        if (current->m_left != nullptr && !current->m_left->m_is_dead) {
-            if (search_free && !current->m_left->m_in_jail) {
-                left_ok = true;
-            }
-            if (!search_free && current->m_left->m_in_jail) {
-                left_ok = true;
-            }
-        }
-        if (current->m_right != nullptr && !current->m_right->m_is_dead) {
-            if (search_free && !current->m_right->m_in_jail) {
-                right_ok = true;
-            }
-            if (!search_free && current->m_right->m_in_jail) {
-                right_ok = true;
-            }
-        }
+    Member* cur_boss = boss->m_boss;
+    while (cur_boss != nullptr) {
+        bool left_ok = find_first_alive(cur_boss->m_left, search_free) != nullptr;
+        bool right_ok = find_first_alive(cur_boss->m_right, search_free) != nullptr;
 
         if (left_ok && right_ok) {
-            if (current->m_left != nullptr && !current->m_left->m_is_dead) {
-                if (search_free && !current->m_left->m_in_jail) {
-                    return current->m_left;
-                }
-                if (!search_free && current->m_left->m_in_jail) {
-                    return current->m_left;
-                }
+            Member* candidate = find_first_alive(cur_boss->m_left, search_free);
+            if (candidate != nullptr) {
+                return candidate;
             }
-            if (current->m_right != nullptr && !current->m_right->m_is_dead) {
-                if (search_free && !current->m_right->m_in_jail) {
-                    return current->m_right;
-                }
-                if (!search_free && current->m_right->m_in_jail) {
-                    return current->m_right;
-                }
+            candidate = find_first_alive(cur_boss->m_right, search_free);
+            if (candidate != nullptr) {
+                return candidate;
             }
         }
-        current = current->m_boss;
+        cur_boss = cur_boss->m_boss;
     }
     return nullptr;
 }
@@ -236,6 +185,21 @@ void FamilyTree::show_succession_rec(Member* node, int& position) const {
     show_succession_rec(node->m_right, position);
 }
 
+bool FamilyTree::attach_member_to_boss(Member* member, Member* boss) {
+    member->m_boss = boss;
+    if (boss->m_left == nullptr) {
+        boss->m_left = member;
+        return true;
+    }
+    if (boss->m_right == nullptr) {
+        boss->m_right = member;
+        return true;
+    }
+    cerr << "Jefe " << boss->m_id << " ya tiene dos hijos.\n";
+    delete member;
+    return false;
+}
+
 void FamilyTree::attach_orphans() {
     bool progress;
     do {
@@ -245,17 +209,9 @@ void FamilyTree::attach_orphans() {
             Member* m = m_orphan_queue.pop();
             Member* boss = find_member_by_id(m->m_id_boss);
             if (boss != nullptr) {
-                m->m_boss = boss;
-                if (boss->m_left == nullptr)
-                    boss->m_left = m;
-                else if (boss->m_right == nullptr)
-                    boss->m_right = m;
-                else {
-                    cerr << "Jefe " << boss->m_id << " lleno al intentar agregar a " << m->m_id
-                         << "\n";
-                    delete m; // no podemos agregarlo, se descarta
+                if (attach_member_to_boss(m, boss)) {
+                    progress = true;
                 }
-                progress = true;
             } else {
                 temp.push(m); // vuelve a la cola temporal
             }
@@ -267,7 +223,8 @@ void FamilyTree::attach_orphans() {
     } while (progress && !m_orphan_queue.empty());
 }
 
-void FamilyTree::load_from_csv(const string& filename) {
+bool FamilyTree::load_from_csv(const string& filename) {
+    // clean up previous data
     delete_tree(m_root);
     m_root = nullptr;
     while (!m_orphan_queue.empty()) {
@@ -277,54 +234,15 @@ void FamilyTree::load_from_csv(const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
         cerr << "Error al abrir " << filename << "\n";
-        return;
+        return false;
     }
 
+    // cabecera
     string line;
-    getline(file, line); // cabecera
+    getline(file, line);
 
     while (getline(file, line)) {
-        stringstream ss(line);
-        string token;
-
-        int id, age, id_boss;
-        string name, last_name;
-        char gender;
-        bool is_dead, in_jail, was_boss, is_boss;
-
-        // id
-        getline(ss, token, ',');
-        id = stoi(token);
-        // name
-        getline(ss, token, ',');
-        name = token;
-        // last_name
-        getline(ss, token, ',');
-        last_name = token;
-        // gender
-        getline(ss, token, ',');
-        gender = token[0];
-
-        getline(ss, token, ',');
-        age = stoi(token);
-        // id_boss
-        getline(ss, token, ',');
-        id_boss = stoi(token);
-        // is_dead
-        getline(ss, token, ',');
-        is_dead = (stoi(token) == 1);
-        // in_jail
-        getline(ss, token, ',');
-        in_jail = (stoi(token) == 1);
-        // was_boss
-        getline(ss, token, ',');
-        was_boss = (stoi(token) == 1);
-        // is_boss
-        getline(ss, token, ',');
-        is_boss = (stoi(token) == 1);
-
-        Member* new_member = new Member(id, name, last_name, gender, age, id_boss, is_dead, in_jail,
-                                        was_boss, is_boss);
+        Member* new_member = CSVParser::parse_csv_line(line);
 
         if (new_member->m_id_boss == 0) {
             if (m_root == nullptr) {
@@ -337,15 +255,8 @@ void FamilyTree::load_from_csv(const string& filename) {
         } else {
             Member* boss = find_member_by_id(new_member->m_id_boss);
             if (boss != nullptr) {
-                // enlazar al jefe
-                new_member->m_boss = boss;
-                if (boss->m_left == nullptr)
-                    boss->m_left = new_member;
-                else if (boss->m_right == nullptr)
-                    boss->m_right = new_member;
-                else {
-                    cerr << "Jefe " << boss->m_id << " ya tiene dos hijos.\n";
-                    delete new_member;
+                if (!attach_member_to_boss(new_member, boss)) {
+                    continue;
                 }
             } else {
                 m_orphan_queue.push(new_member);
@@ -380,6 +291,7 @@ void FamilyTree::load_from_csv(const string& filename) {
              << " no encontrado)\n";
         delete m; // Se liberan al no poder almacenarse
     }
+    return true;
 }
 
 void FamilyTree::check_and_assign_boss() {

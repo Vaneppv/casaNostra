@@ -10,7 +10,8 @@ SOURCES := \
     $(SRCDIR)/family_tree/family_tree.cpp \
     $(SRCDIR)/orphan_queue/orphan_queue.cpp \
     $(SRCDIR)/orphan_node/orphan_node.cpp \
-    $(SRCDIR)/presentation/main_menu.cpp
+    $(SRCDIR)/presentation/main_menu.cpp \
+    $(SRCDIR)/parser/csv_parser.cpp
 
 OBJECTS := $(SOURCES:$(SRCDIR)/%.cpp=$(BINDIR)/%.o)
 

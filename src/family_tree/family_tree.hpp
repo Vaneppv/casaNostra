@@ -11,19 +11,19 @@ private:
 
     void delete_tree(Member* node);
     Member* find_member_by_id_rec(Member* node, int id) const;
-    Member* find_first_alive_free(Member* node) const;
-    Member* find_first_alive_jailed(Member* node) const;
+    Member* find_first_alive(Member* node, bool search_free) const;
     Member* find_current_boss(Member* node) const;
     Member* find_successor(Member* boss, bool search_free) const;
     Member* find_nearest_boss_with_two(Member* boss, bool search_free) const;
     void show_succession_rec(Member* node, int& position) const;
+    bool attach_member_to_boss(Member* member, Member* boss);
     void attach_orphans();
 
 public:
     FamilyTree() = default;
     ~FamilyTree() { delete_tree(m_root); }
     Member* get_root() const { return m_root; }
-    void load_from_csv(const std::string& filename);
+    bool load_from_csv(const std::string& filename);
     Member* find_member_by_id(int id) const;
     void check_and_assign_boss();
     void edit_member(int id);

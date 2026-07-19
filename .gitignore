@@ -2,6 +2,8 @@
 bin/casa_nostra
 bin/*.exe
 bin/*.out
+bin/*.bin
+bin/*.ex
 
 # Object files
 *.o
