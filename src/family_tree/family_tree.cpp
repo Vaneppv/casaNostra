@@ -2,8 +2,8 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
+#include "../parser/csv_parser.hpp"
 #include "../utils/constants.hpp"
 
 using namespace std;
@@ -217,6 +217,7 @@ void FamilyTree::attach_orphans() {
 }
 
 void FamilyTree::load_from_csv(const string& filename) {
+    // clean up previous data
     delete_tree(m_root);
     m_root = nullptr;
     while (!m_orphan_queue.empty()) {
@@ -229,51 +230,12 @@ void FamilyTree::load_from_csv(const string& filename) {
         return;
     }
 
+    // cabecera
     string line;
-    getline(file, line); // cabecera
+    getline(file, line);
 
     while (getline(file, line)) {
-        stringstream ss(line);
-        string token;
-
-        int id, age, id_boss;
-        string name, last_name;
-        char gender;
-        bool is_dead, in_jail, was_boss, is_boss;
-
-        // id
-        getline(ss, token, ',');
-        id = stoi(token);
-        // name
-        getline(ss, token, ',');
-        name = token;
-        // last_name
-        getline(ss, token, ',');
-        last_name = token;
-        // gender
-        getline(ss, token, ',');
-        gender = token[0];
-
-        getline(ss, token, ',');
-        age = stoi(token);
-        // id_boss
-        getline(ss, token, ',');
-        id_boss = stoi(token);
-        // is_dead
-        getline(ss, token, ',');
-        is_dead = (stoi(token) == 1);
-        // in_jail
-        getline(ss, token, ',');
-        in_jail = (stoi(token) == 1);
-        // was_boss
-        getline(ss, token, ',');
-        was_boss = (stoi(token) == 1);
-        // is_boss
-        getline(ss, token, ',');
-        is_boss = (stoi(token) == 1);
-
-        Member* new_member = new Member(id, name, last_name, gender, age, id_boss, is_dead, in_jail,
-                                        was_boss, is_boss);
+        Member* new_member = CSVParser::parse_csv_line(line);
 
         if (new_member->m_id_boss == 0) {
             if (m_root == nullptr) {
