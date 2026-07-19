@@ -43,5 +43,7 @@ int main() {
 
     menu.set_option("Reasignar jefe automáticamente", [&tree]() { tree.check_and_assign_boss(); });
 
+    menu.show_menu();
+
     return 0;
 }
