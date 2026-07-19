@@ -17,7 +17,7 @@ int main() {
     MainMenu menu("Casa Nostra - Árbol Binario", &tree);
 
     menu.set_option("Cargar datos desde CSV", [&menu, &tree]() {
-        std::string path = menu.prompt_input("Ingrese ruta del archivo CSV: ");
+        std::string path = menu.prompt_input("Ingrese ruta del archivo CSV [bin/datos.csv]: ");
         if (path.empty()) {
             path = "bin/datos.csv";
         }

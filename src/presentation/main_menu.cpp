@@ -54,7 +54,7 @@ bool MainMenu::confirm_action(const std::string& prompt) {
 std::string MainMenu::prompt_input(const std::string& prompt) {
     std::cout << COLOR_YELLOW << prompt << COLOR_RESET;
     std::string value;
-    std::getline(std::cin >> std::ws, value);
+    std::getline(std::cin, value);
     return value;
 }
 
