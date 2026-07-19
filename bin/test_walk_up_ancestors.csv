@@ -1,0 +1,13 @@
+# Condition 5: All successor paths exhausted → walk up ancestors
+# Tree: All members are dead except the root Grandpa
+#   Grandpa (alive)
+#   ├── BossParent (dead)
+#   │   └── Boss (dead, is_boss, no children)
+#   └── DeadUncle (dead, no children)
+# Every possible successor path returns null.
+# Expected: "No se pudo encontrar un sucesor adecuado"
+id,name,last_name,gender,age,id_boss,is_dead,in_jail,was_boss,is_boss
+1,Grandpa,Corleone,H,70,0,0,0,1,0
+2,BossParent,Corleone,H,50,1,1,0,0,0
+3,DeadUncle,Corleone,H,48,1,1,0,0,0
+4,Boss,Corleone,H,30,2,1,0,0,1

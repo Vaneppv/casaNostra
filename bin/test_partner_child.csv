@@ -1,0 +1,14 @@
+# Condition 2: Boss dead, no successors → partner's child becomes boss
+# Tree:
+#   Godfather
+#   ├── Boss (dead, is_boss) → DeadChild (dead)
+#   └── Partner (alive) → Successor (alive, free)
+# Boss (2) has no alive children (DeadChild is dead)
+# Partner's child (Successor, ID 5) is alive and free
+# Expected: Successor (ID 5) becomes new boss
+id,name,last_name,gender,age,id_boss,is_dead,in_jail,was_boss,is_boss
+1,Godfather,Corleone,H,65,0,0,0,1,0
+2,Boss,Corleone,H,45,1,1,0,0,1
+3,Partner,Corleone,H,40,1,0,0,0,0
+4,DeadChild,Corleone,H,20,2,1,0,0,0
+5,Successor,Corleone,H,22,3,0,0,0,0

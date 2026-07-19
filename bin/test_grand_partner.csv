@@ -1,0 +1,18 @@
+# Condition 4: Boss dead, no successors anywhere in chain → deep search to grand-partner
+# Tree:
+#   GreatGrandpa
+#   ├── GrandpaA
+#   │   ├── Boss (dead, is_boss, no children)
+#   │   └── Partner (dead)
+#   └── GrandpaB (dead)
+#       └── DeepSuccessor (alive, free)
+# Boss (4) dead. Partner (5) dead. Grand_partner = GrandpaB (dead).
+# Search GrandpaB's children → DeepSuccessor (6, alive, free) becomes boss
+# Expected: DeepSuccessor (ID 6) becomes new boss
+id,name,last_name,gender,age,id_boss,is_dead,in_jail,was_boss,is_boss
+1,GreatGrandpa,Corleone,H,80,0,0,0,1,0
+2,GrandpaA,Corleone,H,60,1,0,0,1,0
+3,GrandpaB,Corleone,H,58,1,1,0,0,0
+4,Boss,Corleone,H,40,2,1,0,0,1
+5,Partner,Corleone,H,38,2,1,0,0,0
+6,DeepSuccessor,Corleone,H,25,3,0,0,0,0

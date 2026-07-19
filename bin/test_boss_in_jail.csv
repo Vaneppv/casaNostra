@@ -1,0 +1,8 @@
+# Condition 7: Boss in jail → successor from his tree
+# Vito (in_jail=1, is_boss) needs replacement
+# check_and_assign_boss: boss->m_in_jail is true → trigger succession
+# Michael (38, alive, free) in Vito's tree → becomes new boss
+# Expected: Michael becomes is_boss=true, Vito becomes was_boss=true
+id,name,last_name,gender,age,id_boss,is_dead,in_jail,was_boss,is_boss
+1,Vito,Corleone,H,55,0,0,1,0,1
+2,Michael,Corleone,H,38,1,0,0,0,0

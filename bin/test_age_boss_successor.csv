@@ -1,0 +1,7 @@
+# Condition 1/7: Boss age >= 70 → successor from his tree
+# Vito (72 > MAX_AGE=70, is_boss) needs replacement
+# Michael (38, alive, free) is in Vito's tree → becomes new boss
+# Expected: Michael becomes is_boss=true, Vito becomes was_boss=true
+id,name,last_name,gender,age,id_boss,is_dead,in_jail,was_boss,is_boss
+1,Vito,Corleone,H,72,0,0,0,0,1
+2,Michael,Corleone,H,38,1,0,0,0,0
