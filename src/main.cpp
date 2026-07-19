@@ -4,16 +4,28 @@
 #include "family_tree/family_tree.hpp"
 #include "presentation/main_menu.hpp"
 
+bool load_csv_file(FamilyTree& tree, const std::string& path) {
+    if (path.empty()) {
+        return false;
+    }
+    std::cout << "Cargando datos...\n";
+    return tree.load_from_csv(path);
+}
+
 int main() {
     FamilyTree tree;
     MainMenu menu("Casa Nostra - Árbol Binario", &tree);
 
     menu.set_option("Cargar datos desde CSV", [&menu, &tree]() {
         std::string path = menu.prompt_input("Ingrese ruta del archivo CSV: ");
-
-        std::cout << "Cargando datos...\n";
-        tree.load_from_csv(path.empty() ? "bin/datos.csv" : path);
-        menu.print_success("Datos cargados correctamente.");
+        if (path.empty()) {
+            path = "bin/datos.csv";
+        }
+        if (load_csv_file(tree, path)) {
+            menu.print_success("Datos cargados correctamente.");
+        } else {
+            menu.print_error("No se pudo cargar el archivo.");
+        }
     });
 
     menu.set_option("Editar miembro", [&menu, &tree]() {

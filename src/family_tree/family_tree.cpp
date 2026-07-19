@@ -223,7 +223,7 @@ void FamilyTree::attach_orphans() {
     } while (progress && !m_orphan_queue.empty());
 }
 
-void FamilyTree::load_from_csv(const string& filename) {
+bool FamilyTree::load_from_csv(const string& filename) {
     // clean up previous data
     delete_tree(m_root);
     m_root = nullptr;
@@ -234,7 +234,7 @@ void FamilyTree::load_from_csv(const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
         cerr << "Error al abrir " << filename << "\n";
-        return;
+        return false;
     }
 
     // cabecera
@@ -291,6 +291,7 @@ void FamilyTree::load_from_csv(const string& filename) {
              << " no encontrado)\n";
         delete m; // Se liberan al no poder almacenarse
     }
+    return true;
 }
 
 void FamilyTree::check_and_assign_boss() {
