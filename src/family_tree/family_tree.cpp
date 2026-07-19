@@ -10,11 +10,15 @@ using namespace std;
 using namespace Constants::ASCII_CODES;
 
 void FamilyTree::delete_tree(Member* node) {
-    if (node == nullptr) return;
+    if (node == nullptr) {
+        return;
+    }
+
     delete_tree(node->m_left);
     delete_tree(node->m_right);
 
     delete node;
+    node = nullptr;
 }
 
 Member* FamilyTree::find_member_by_id_rec(Member* node, int id) const {
@@ -34,32 +38,33 @@ Member* FamilyTree::find_member_by_id(int id) const {
     return find_member_by_id_rec(m_root, id);
 }
 
-Member* FamilyTree::find_first_alive_free(Member* node) const {
+/**
+ *
+ * @brief - Busca el primer miembro vivo en el arbol de la familia
+ * @param node - Raiz del arbol
+ * @param search_free - Busca miembros libres
+ */
+Member* FamilyTree::find_first_alive(Member* node, bool search_free) const {
     if (node == nullptr) {
         return nullptr;
     }
-    if (!node->m_is_dead && !node->m_in_jail) {
-        return node;
-    }
-    Member* found = find_first_alive_free(node->m_left);
-    if (found != nullptr) {
-        return found;
-    }
-    return find_first_alive_free(node->m_right);
-}
 
-Member* FamilyTree::find_first_alive_jailed(Member* node) const {
-    if (node == nullptr) {
-        return nullptr;
+    // El miembro está vivo, retorna el miembro
+    if (!node->m_is_dead) {
+        if (search_free && !node->m_in_jail) {
+            return node;
+        }
+        if (!search_free && node->m_in_jail) {
+            return node;
+        }
     }
-    if (!node->m_is_dead && node->m_in_jail) {
-        return node;
-    }
-    Member* found = find_first_alive_jailed(node->m_left);
+
+    Member* found = find_first_alive(node->m_left, search_free);
     if (found != nullptr) {
         return found;
     }
-    return find_first_alive_jailed(node->m_right);
+
+    return find_first_alive(node->m_right, search_free);
 }
 
 Member* FamilyTree::find_current_boss(Member* node) const {
@@ -81,49 +86,30 @@ Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
         return nullptr;
     }
 
-    Member* succ;
+    Member* successor;
 
-    if (search_free) {
-        succ = find_first_alive_free(boss->m_left);
-        if (succ == nullptr) {
-            succ = find_first_alive_free(boss->m_right);
-        }
-    } else {
-        succ = find_first_alive_jailed(boss->m_left);
-        if (succ == nullptr) {
-            succ = find_first_alive_jailed(boss->m_right);
-        }
+    successor = find_first_alive(boss->m_left, search_free);
+    if (successor == nullptr) {
+        successor = find_first_alive(boss->m_right, search_free);
     }
-    if (succ != nullptr) {
-        return succ;
+    if (successor != nullptr) {
+        return successor;
     }
 
     if (boss->m_boss != nullptr) {
         Member* partner =
             (boss->m_boss->m_left == boss) ? boss->m_boss->m_right : boss->m_boss->m_left;
         if (partner != nullptr) {
-            if (search_free) {
-                succ = find_first_alive_free(partner->m_left);
-                if (succ == nullptr) {
-                    succ = find_first_alive_free(partner->m_right);
-                }
-            } else {
-                succ = find_first_alive_jailed(partner->m_left);
-                if (succ == nullptr) {
-                    succ = find_first_alive_jailed(partner->m_right);
-                }
+            successor = find_first_alive(partner->m_left, search_free);
+            if (successor == nullptr) {
+                successor = find_first_alive(partner->m_right, search_free);
             }
-            if (succ != nullptr) {
-                return succ;
+            if (successor != nullptr) {
+                return successor;
             }
 
-            if (!partner->m_is_dead) {
-                if (search_free && !partner->m_in_jail) {
-                    return partner;
-                }
-                if (!search_free && partner->m_in_jail) {
-                    return partner;
-                }
+            if (find_first_alive(partner, search_free) != nullptr) {
+                return partner;
             }
         }
     }
@@ -133,28 +119,16 @@ Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
         Member* grand_partner =
             (grand_boss->m_left == boss->m_boss) ? grand_boss->m_right : grand_boss->m_left;
         if (grand_partner != nullptr) {
-            if (search_free) {
-                succ = find_first_alive_free(grand_partner->m_left);
-                if (succ == nullptr) {
-                    succ = find_first_alive_free(grand_partner->m_right);
-                }
-            } else {
-                succ = find_first_alive_jailed(grand_partner->m_left);
-                if (succ == nullptr) {
-                    succ = find_first_alive_jailed(grand_partner->m_right);
-                }
+            successor = find_first_alive(grand_partner->m_left, search_free);
+            if (successor == nullptr) {
+                successor = find_first_alive(grand_partner->m_right, search_free);
             }
-            if (succ != nullptr) {
-                return succ;
+            if (successor != nullptr) {
+                return successor;
             }
 
-            if (!grand_partner->m_is_dead) {
-                if (search_free && !grand_partner->m_in_jail) {
-                    return grand_partner;
-                }
-                if (!search_free && grand_partner->m_in_jail) {
-                    return grand_partner;
-                }
+            if (find_first_alive(grand_partner, search_free) != nullptr) {
+                return grand_partner;
             }
         }
     }
@@ -163,47 +137,22 @@ Member* FamilyTree::find_successor(Member* boss, bool search_free) const {
 }
 
 Member* FamilyTree::find_nearest_boss_with_two(Member* boss, bool search_free) const {
-    Member* current = boss->m_boss;
-    while (current != nullptr) {
-        bool left_ok = false;
-        bool right_ok = false;
-
-        if (current->m_left != nullptr && !current->m_left->m_is_dead) {
-            if (search_free && !current->m_left->m_in_jail) {
-                left_ok = true;
-            }
-            if (!search_free && current->m_left->m_in_jail) {
-                left_ok = true;
-            }
-        }
-        if (current->m_right != nullptr && !current->m_right->m_is_dead) {
-            if (search_free && !current->m_right->m_in_jail) {
-                right_ok = true;
-            }
-            if (!search_free && current->m_right->m_in_jail) {
-                right_ok = true;
-            }
-        }
+    Member* cur_boss = boss->m_boss;
+    while (cur_boss != nullptr) {
+        bool left_ok = find_first_alive(cur_boss->m_left, search_free) != nullptr;
+        bool right_ok = find_first_alive(cur_boss->m_right, search_free) != nullptr;
 
         if (left_ok && right_ok) {
-            if (current->m_left != nullptr && !current->m_left->m_is_dead) {
-                if (search_free && !current->m_left->m_in_jail) {
-                    return current->m_left;
-                }
-                if (!search_free && current->m_left->m_in_jail) {
-                    return current->m_left;
-                }
+            Member* candidate = find_first_alive(cur_boss->m_left, search_free);
+            if (candidate != nullptr) {
+                return candidate;
             }
-            if (current->m_right != nullptr && !current->m_right->m_is_dead) {
-                if (search_free && !current->m_right->m_in_jail) {
-                    return current->m_right;
-                }
-                if (!search_free && current->m_right->m_in_jail) {
-                    return current->m_right;
-                }
+            candidate = find_first_alive(cur_boss->m_right, search_free);
+            if (candidate != nullptr) {
+                return candidate;
             }
         }
-        current = current->m_boss;
+        cur_boss = cur_boss->m_boss;
     }
     return nullptr;
 }
